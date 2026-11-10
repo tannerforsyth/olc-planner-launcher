@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OLC Planner</title>
+  <meta name="apple-mobile-web-app-title" content="OLC Planner">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta name="theme-color" content="#202219">
+  <style>
+    :root { --bg: #e9e8e0; --panel: #f3f2ec; --ink: #202219; --muted: #50533f; --line: rgba(70, 73, 60, 0.2); color-scheme: light; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #202219; --panel: #282a20; --ink: #dddbcd; --muted: #a4a395; --line: rgba(215, 213, 198, 0.13); color-scheme: dark; }
+    }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--ink);
+      font: 16px/1.5 'Work Sans', system-ui, -apple-system, sans-serif; padding: 24px 16px; box-sizing: border-box; }
+    main { max-width: 420px; width: 100%; display: grid; gap: 16px; justify-items: start; }
+    img { width: 96px; height: 96px; border-radius: 22px; border: 1px solid var(--line); }
+    h1 { font: 800 26px/1.15 'Bitter', Georgia, serif; margin: 0; }
+    p { margin: 0; color: var(--muted); }
+    ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+    a { color: var(--ink); font-weight: 600; }
+    .box { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px; width: 100%; box-sizing: border-box; display: grid; gap: 10px; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="apple-touch-icon.png" alt="">
+    <h1>OLC Planner</h1>
+    <div class="box" id="setup" hidden>
+      <p>Add the planner to your home screen:</p>
+      <ol>
+        <li>Tap the Share button in Safari.</li>
+        <li>Tap <strong>Add to Home Screen</strong>, then <strong>Add</strong>.</li>
+      </ol>
+      <p>The bear icon opens the planner straight away.</p>
+    </div>
+    <p id="going">Opening the planner. <a id="open" href="#">Open it now</a>.</p>
+  </main>
+  <script>
+    // The planner (Google Apps Script web app, only usable by its owner).
+    var APP = 'https://script.google.com/macros/s/AKfycbyDR4eisJoky7xlqQI9_fcGPSrBCGcZMkfkK-M5rHdqN-hzZYGHQkTpXYSWehUBsEPXDg/exec';
+    document.getElementById('open').href = APP;
+    if (/[?&]setup\b/.test(location.search)) {
+      // Setup visit: show the steps and drop ?setup from the address, so the home screen
+      // icon saves the plain address, which forwards to the planner.
+      history.replaceState(null, '', location.pathname);
+      document.getElementById('setup').hidden = false;
+      document.getElementById('going').hidden = true;
+    } else {
+      location.replace(APP);
+    }
+  </script>
+</body>
+</html>
