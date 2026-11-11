@@ -2,55 +2,86 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>OLC Planner</title>
-  <meta name="apple-mobile-web-app-title" content="OLC Planner">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="favicon.png">
+  <!-- This page is the top-level document, so iPhone reads these when it is added to the home screen. -->
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
   <meta name="theme-color" content="#202219">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="OLC Planner">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@800&family=Work+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <script>
+    // The planner: Google Apps Script web app (versioned /exec deployment, owner-only).
+    var APP_URL = 'https://script.google.com/macros/s/AKfycbyDR4eisJoky7xlqQI9_fcGPSrBCGcZMkfkK-M5rHdqN-hzZYGHQkTpXYSWehUBsEPXDg/exec';
+    var standalone = window.navigator.standalone === true ||
+      (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+    var phone = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+      (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent)); // iPadOS reports as a Mac
+    // Launched from the home screen, or on a computer: go straight to the planner.
+    // In a phone browser tab: stay here so the icon is added from this page.
+    if (standalone || !phone) location.replace(APP_URL);
+  </script>
   <style>
-    :root { --bg: #e9e8e0; --panel: #f3f2ec; --ink: #202219; --muted: #50533f; --line: rgba(70, 73, 60, 0.2); color-scheme: light; }
+    :root { --bg: #e9e8e0; --panel: #f3f2ec; --ink: #202219; --muted: #50533f; --line: rgba(70, 73, 60, 0.2);
+      --primary: #202219; --on-primary: #f3f2ec; color-scheme: light; }
     @media (prefers-color-scheme: dark) {
-      :root { --bg: #202219; --panel: #282a20; --ink: #dddbcd; --muted: #a4a395; --line: rgba(215, 213, 198, 0.13); color-scheme: dark; }
+      :root { --bg: #202219; --panel: #282a20; --ink: #dddbcd; --muted: #a4a395; --line: rgba(215, 213, 198, 0.13);
+        --primary: #d7d5c6; --on-primary: #202219; color-scheme: dark; }
     }
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--ink);
-      font: 16px/1.5 'Work Sans', system-ui, -apple-system, sans-serif; padding: 24px 16px; box-sizing: border-box; }
-    main { max-width: 420px; width: 100%; display: grid; gap: 16px; justify-items: start; }
-    img { width: 96px; height: 96px; border-radius: 22px; border: 1px solid var(--line); }
-    h1 { font: 800 26px/1.15 'Bitter', Georgia, serif; margin: 0; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink);
+      font: 16px/1.5 'Work Sans', system-ui, -apple-system, sans-serif;
+      padding: max(24px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 32px max(16px, env(safe-area-inset-left));
+      display: grid; place-items: center; }
+    main { max-width: 420px; width: 100%; display: grid; gap: 18px; }
+    .icon { width: 88px; height: 88px; border-radius: 20px; border: 1px solid var(--line); display: block; }
+    h1 { font: 800 28px/1.15 'Bitter', Georgia, serif; margin: 0; }
     p { margin: 0; color: var(--muted); }
+    .box { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px; display: grid; gap: 10px; }
+    .box h2 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin: 0; }
     ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
-    a { color: var(--ink); font-weight: 600; }
-    .box { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px; width: 100%; box-sizing: border-box; display: grid; gap: 10px; }
+    strong { font-weight: 600; }
+    .btn { display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 4px;
+      background: var(--primary); color: var(--on-primary); font-weight: 600; text-decoration: none; }
+    .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
     [hidden] { display: none !important; }
   </style>
 </head>
 <body>
   <main>
-    <img src="apple-touch-icon.png" alt="">
+    <img class="icon" src="/apple-touch-icon.png" alt="">
     <h1>OLC Planner</h1>
-    <div class="box" id="setup" hidden>
-      <p>Add the planner to your home screen:</p>
+    <div class="box" id="ios">
+      <h2>Add to your home screen</h2>
       <ol>
-        <li>Tap the Share button in Safari.</li>
-        <li>Tap <strong>Add to Home Screen</strong>, then <strong>Add</strong>.</li>
+        <li>Tap the <strong>Share</strong> button in Safari.</li>
+        <li>Tap <strong>Add to Home Screen</strong>. Leave <strong>Open as Web App</strong> on.</li>
+        <li>Tap <strong>Add</strong>, then open the planner from the bear icon.</li>
       </ol>
-      <p>The bear icon opens the planner straight away.</p>
     </div>
-    <p id="going">Opening the planner. <a id="open" href="#">Open it now</a>.</p>
+    <div class="box" id="android" hidden>
+      <h2>Add to your home screen</h2>
+      <ol>
+        <li>Tap the <strong>menu</strong> in Chrome.</li>
+        <li>Tap <strong>Add to Home screen</strong>, then <strong>Install</strong>.</li>
+        <li>Open the planner from the new icon.</li>
+      </ol>
+    </div>
+    <p>The icon opens the planner full screen. The first time, it may ask you to sign in to Google.</p>
+    <a class="btn" id="open" href="#">Open the planner in Safari</a>
   </main>
   <script>
-    // The planner (Google Apps Script web app, only usable by its owner).
-    var APP = 'https://script.google.com/macros/s/AKfycbyDR4eisJoky7xlqQI9_fcGPSrBCGcZMkfkK-M5rHdqN-hzZYGHQkTpXYSWehUBsEPXDg/exec';
-    document.getElementById('open').href = APP;
-    if (/[?&]setup\b/.test(location.search)) {
-      // Setup visit: show the steps and drop ?setup from the address, so the home screen
-      // icon saves the plain address, which forwards to the planner.
-      history.replaceState(null, '', location.pathname);
-      document.getElementById('setup').hidden = false;
-      document.getElementById('going').hidden = true;
-    } else {
-      location.replace(APP);
+    document.getElementById('open').href = APP_URL;
+    if (/Android/i.test(navigator.userAgent)) {
+      document.getElementById('ios').hidden = true;
+      document.getElementById('android').hidden = false;
+      document.getElementById('open').textContent = 'Open the planner in Chrome';
     }
   </script>
 </body>
